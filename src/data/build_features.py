@@ -3,7 +3,10 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(0,'../src/modules')
+try:
+    sys.path.insert(0,'../modules')
+except:
+    sys.path.insert(0,'./modules')
 import circstats as CS
 import scipy as sc
 
@@ -67,9 +70,9 @@ def corr_lr(df, var):
     return idf.corr().loc['L','R']
 
 
-def main(data_set):
-    pose_estimates_path = '../data/pose_estimates/'+data_set+'/py'
-    feature_path = '../data/interim'
+def main(data_set, data_path):
+    pose_estimates_path = f'{data_path}/pose_estimates/'+data_set+'/py'
+    feature_path = f'{data_path}/interim'
 
     xdf = pd.read_pickle(os.path.join(pose_estimates_path, 'processed_pose_estimates_coords.pkl'))
     adf = pd.read_pickle(os.path.join(pose_estimates_path, 'processed_pose_estimates_angles.pkl'))
@@ -92,7 +95,7 @@ def main(data_set):
     feature_angle = pd.merge(feature_angle,corr_joint, on='video', how='outer')
     # xy features
     bps = ['LAnkle', 'RAnkle', 'LWrist', 'RWrist']
-    feature_xy = xdf[np.isin(xdf.bp, bps)].groupby(['bp','video']).apply(xy_features)
+    feature_xy = xdf[np.isin(xdf.bp, bps)].groupby(['bp','video']).apply(xy_features).reset_index(drop=True)
     feature_xy = pd.pivot_table(feature_xy, index='video', columns=['bp'])
     l0 = feature_xy.columns.get_level_values(1)
     l1 = feature_xy.columns.get_level_values(0)

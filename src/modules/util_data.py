@@ -8,11 +8,15 @@ from moviepy.editor import VideoFileClip
 import itertools
 import skvideo.io
 
+np.float = np.float64
+np.int = np.int_
+
 def get_fps(videoname):
     clip = VideoFileClip(videoname)
     return clip.fps
 
 def read_video(video):
+
     videogen = skvideo.io.vreader(video)
     new_videogen = itertools.islice(videogen, 0, 1, 1)
     for image in new_videogen:
@@ -72,7 +76,7 @@ def load_raw_pkl_files(path):
     df_pkl = pd.DataFrame()
     for file in pklfiles:
         one_file = pd.read_pickle(file).reset_index().drop('index',axis = 1)
-        df_pkl = df_pkl.append(one_file)
+        df_pkl = pd.concat([df_pkl, one_file])
     df_pkl = df_pkl.reset_index().drop('index', axis = 1)
     return df_pkl
 
@@ -268,7 +272,7 @@ def get_joint_angles(df):
     # can include shoulder rotation
     df_2['bp'] = df_2['bp0']
 
-    df_info = df.groupby(['video', 'frame', 'fps','time', 'delta_t']).mean().reset_index()[['video', 'frame', 'fps','time', 'delta_t']]
+    df_info = df.groupby(['video', 'frame', 'fps','time', 'delta_t']).mean(numeric_only=True).reset_index()[['video', 'frame', 'fps','time', 'delta_t']]
     df_angle = pd.merge(df_2[['video', 'frame', 'bp', 'side', 'part', 'angle']],\
     df_info, on=['video', 'frame'], how='inner').drop_duplicates()
     return df_angle
@@ -307,18 +311,18 @@ def get_dynamics_xy(xdf, delta_window):
     xdf['displacement'] = np.sqrt(xdf['d_x']**2 + xdf['d_y']**2)
     xdf['velocity_x_raw'] = xdf['d_x']/xdf['delta_t']
     xdf['velocity_y_raw'] = xdf['d_y']/xdf['delta_t']
-    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_x_raw','velocity_x', delta_window))
-    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_y_raw','velocity_y', delta_window))
+    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_x_raw','velocity_x', delta_window)).reset_index(drop=True)
+    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_y_raw','velocity_y', delta_window)).reset_index(drop=True)
     xdf = xdf.groupby(['bp','video']).apply(lambda x: get_delta(x,'velocity_x','delta_velocity_x')).reset_index(drop=True)
     xdf = xdf.groupby(['bp','video']).apply(lambda x: get_delta(x,'velocity_y','delta_velocity_y')).reset_index(drop=True)
     xdf['acceleration_x_raw'] = xdf['delta_velocity_x']/xdf['delta_t']
     xdf['acceleration_y_raw'] = xdf['delta_velocity_y']/xdf['delta_t']
-    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_x_raw','acceleration_x', delta_window))
-    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_y_raw','acceleration_y', delta_window))
+    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_x_raw','acceleration_x', delta_window)).reset_index(drop=True)
+    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_y_raw','acceleration_y', delta_window)).reset_index(drop=True)
     xdf['acceleration_x2'] = xdf['acceleration_x']**2
     xdf['acceleration_y2'] = xdf['acceleration_y']**2
     xdf['speed_raw'] = xdf['displacement']/xdf['delta_t']
-    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'speed_raw','speed', delta_window))
+    xdf = xdf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'speed_raw','speed', delta_window)).reset_index(drop=True)
     xdf['part'] = xdf.bp.str[1:]
     xdf['side'] = xdf.bp.str[:1]
     return xdf
@@ -326,10 +330,10 @@ def get_dynamics_xy(xdf, delta_window):
 def get_dynamics_angle(adf, delta_window):
     adf = adf.groupby(['bp','video']).apply(lambda x: get_angle_displacement(x,'angle','displacement')).reset_index(drop=True)
     adf['velocity_raw'] = adf['displacement']/adf['delta_t']
-    adf = adf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_raw','velocity', delta_window))
+    adf = adf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'velocity_raw','velocity', delta_window)).reset_index(drop=True)
     adf = adf.groupby(['bp','video']).apply(lambda x: get_delta(x,'velocity','delta_velocity')).reset_index(drop=True)
     adf['acceleration_raw'] = adf['delta_velocity']/adf['delta_t']
-    adf = adf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_raw','acceleration', delta_window))
+    adf = adf.groupby(['bp','video']).apply(lambda x: smooth_dyn(x,'acceleration_raw','acceleration', delta_window)).reset_index(drop=True)
     adf['acceleration2'] = adf['acceleration']**2
     adf['part'] = adf.bp.str[1:]
     adf['side'] = adf.bp.str[:1]
