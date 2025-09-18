@@ -136,3 +136,35 @@ Run `notebooks/visualize_pose_model_error.ipynb`
 
 Performance is quantified by the RMSE, precision, and recall.  
 We compute RMSE normalized by bounding box size. RMSE is computed only for key points which are both in the ground truth data set and model predictions.  
+
+## Note: 
+
+This project is released under a Non-Commercial Research License. For commercial use, please contact prosserl@chop.edu for licensing terms.”
+ 
+Non-Commercial Research License
+Copyright ©2025 The Children's Hospital of Philadelphia.
+ 
+Permission is hereby granted, free of charge, to any person or organization to use, copy, modify, and distribute this software and associated documentation files (the “Software”), for academic, research, or educational purposes only, subject to the following conditions:
+Attribution
+Appropriate credit must be given to the authors in any use, publication, or derivative work of the Software.
+Non-Commercial Use Only
+The Software may not be used, in whole or in part, for commercial purposes, including but not limited to:
+use in a product for sale,
+use in a for-profit company’s operations,
+use in services provided to customers for a fee.
+
+Commercial Licensing
+For commercial use, a separate license must be obtained from the copyright holder. Please contact:
+prosserl@chop.edu
+
+Warranty Disclaimer
+The Software is provided “as is,” without warranty of any kind, express or implied. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability arising from use of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
